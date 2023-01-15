@@ -4,7 +4,8 @@
 	"description": "task server",
 	"main": "index.js",
 	"scripts": {
-		"start": "nodemon index.js"
+		"start": "node index.js",
+		"dev-start": "nodemon index.js"
 	},
 	"author": "Cee Moods",
 	"license": "ISC",
