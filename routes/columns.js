@@ -6,7 +6,7 @@ const Task = require('../models/Task');
 //GET
 router.get('/', async (req, res, next) => {
 	try {
-		const columns = await Column.findAllColumns();
+		const columns = await Column.find();
 		res.status(200).send(columns);
 	} catch (error) {
 		res.status(400).send({ msg: error });

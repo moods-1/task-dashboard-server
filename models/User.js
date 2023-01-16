@@ -58,7 +58,6 @@ const UserSchema = new Schema(
 
 // Find a user by id
 UserSchema.statics.findUser = function (id) {
-	// return this.findById(id);
 	return User.findById(id);
 };
 
@@ -77,16 +76,9 @@ UserSchema.statics.addUser = async function (userObject) {
 // Update user
 UserSchema.statics.updateUser = async function (userObject) {
 	const { _id: id } = userObject;
-
-	const result = await User.updateOne(
-		{ _id: id },
-		{ $set: { ...userObject } }
-	).exec();
-	if (result.modifiedCount) {
-		return await User.findById(id);
-	} else {
-		return result;
-	}
+	return await User.findByIdAndUpdate(id, {
+		$set: { ...userObject },
+	}).exec();
 };
 
 const User = mongoose.model('User', UserSchema);

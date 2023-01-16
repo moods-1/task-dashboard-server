@@ -56,10 +56,14 @@ const TaskSchema = new Schema(
 TaskSchema.statics.addTask = async function (taskObject) {
 	const newTask = new Task(taskObject);
 	newTask.save();
-	const { _id: taskId } = newTask;
+	const { _id: taskId, assignee } = newTask;
 	await Column.findOneAndUpdate(
 		{ state: 'To Do' },
 		{ $push: { taskIds: taskId } }
+	);
+	await User.findByIdAndUpdate(
+		{ _id: assignee },
+		{ $push: { assignedTasks: taskId } }
 	);
 	return newTask;
 };
@@ -84,13 +88,13 @@ TaskSchema.statics.findByFieldAndValue = async function (field, value) {
 // Update task
 TaskSchema.statics.updateTask = async function (taskObject) {
 	try {
-		const { _id: id, assignee, assignor, originalAssignee } = taskObject;
+		const { _id: id, assignee, originalAssignee } = taskObject;
 		// Update assigned user
-		const originalUser = await User.findByIdAndUpdate(
+		await User.findByIdAndUpdate(
 			{ _id: originalAssignee },
 			{ $pull: { assignedTasks: id } }
 		).exec();
-		const targetUser = await User.findByIdAndUpdate(
+		await User.findByIdAndUpdate(
 			{ _id: assignee },
 			{ $push: { assignedTasks: id } }
 		).exec();
@@ -102,19 +106,6 @@ TaskSchema.statics.updateTask = async function (taskObject) {
 	} catch (error) {
 		return error;
 	}
-};
-
-// Create task
-TaskSchema.statics.createTask = async function (taskObject) {
-	const { assignor, assignee, complete, priority, title } = taskObject;
-	const { id } = assignee;
-	const newTask = new Task({
-		assignor,
-		assignee,
-		complete,
-		priority,
-		title,
-	});
 };
 
 const Task = mongoose.model('Task', TaskSchema);

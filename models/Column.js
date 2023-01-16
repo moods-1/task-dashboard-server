@@ -18,11 +18,8 @@ const ColumnSchema = new Schema(
 	},
 	{ collection: 'Column' }
 );
-// Get all columns
-ColumnSchema.statics.findAllColumns = function () {
-	return Column.find();
-};
 
+// Move tasks internally
 ColumnSchema.statics.moveInternal = async function (body) {
 	const { taskId, sourceIndex, destinationIndex, destinationId } = body;
 	const column = await Column.findById(destinationId);

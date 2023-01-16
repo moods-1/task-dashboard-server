@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Task = require('../models/Task');
+const User = require('../models/User');
+const Column = require('../models/Column');
 
 //GET
 router.get('/', async (req, res, next) => {
@@ -40,6 +42,22 @@ router.post('/', async (req, res, next) => {
 		const { body } = req;
 		const result = await Task.addTask(body);
 		res.status(200).json(result);
+	} catch (error) {
+		res.status(400).json(error);
+	}
+});
+
+//DELETE
+router.delete('/', async (req, res, next) => {
+	try {
+		const { body } = req;
+		const { _id: id, assignee, columnId } = body;
+		await User.findByIdAndUpdate(assignee, {
+			$pull: { assignedTasks: id },
+		}).exec();
+		await Column.findByIdAndUpdate(columnId, { $pull: { taskIds: id } }).exec();
+		await Task.findByIdAndDelete({ _id: id }).exec();
+		res.status(200).json({ message: 'Task deleted successfully!' });
 	} catch (error) {
 		res.status(400).json(error);
 	}
