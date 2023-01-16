@@ -14,17 +14,6 @@ router.get('/', async (req, res, next) => {
 	}
 });
 
-router.get('/task-by-field-and-value/:fieldValue', async (req, res, next) => {
-	try {
-		const { fieldValue } = req.params;
-		const [field, value] = fieldValue.split(',');
-		const result = await Task.findByFieldAndValue(field, value.toLowerCase());
-		res.status(201).json(result);
-	} catch (error) {
-		res.status(400).json(error);
-	}
-});
-
 //PATCH
 router.patch('/', async (req, res, next) => {
 	try {
