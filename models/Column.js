@@ -21,10 +21,10 @@ const ColumnSchema = new Schema(
 
 // Move tasks internally
 ColumnSchema.statics.moveInternal = async function (body) {
-	const { taskId, sourceIndex, destinationIndex, destinationId } = body;
+	const { sourceTaskId, sourceIndex, destinationIndex, destinationId } = body;
 	const column = await Column.findById(destinationId);
 	column.taskIds.splice(sourceIndex, 1);
-	column.taskIds.splice(destinationIndex, 0, taskId);
+	column.taskIds.splice(destinationIndex, 0, sourceTaskId);
 	await column.save();
 	return column;
 };

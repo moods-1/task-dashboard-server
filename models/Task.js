@@ -68,11 +68,6 @@ TaskSchema.statics.addTask = async function (taskObject) {
 	return newTask;
 };
 
-// Get all tasks
-TaskSchema.statics.findAllTasks = function () {
-	return this.find();
-};
-
 // Get task by field and partial value
 TaskSchema.statics.findByFieldAndValue = async function (field, value) {
 	try {
