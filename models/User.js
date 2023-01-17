@@ -57,17 +57,17 @@ const UserSchema = new Schema(
 );
 
 // Find a user by id
-UserSchema.statics.findUser = function (id) {
-	return User.findById(id);
+UserSchema.statics.findUser = async function (id) {
+	return await User.findById(id);
 };
 
 // Get all users
-UserSchema.statics.findAllUsers = function () {
-	return User.find();
+UserSchema.statics.findAllUsers = async function () {
+	return await User.find();
 };
 
 // Create new user
-UserSchema.statics.addUser = async function (userObject) {
+UserSchema.statics.addUser = function (userObject) {
 	const newUser = new User(userObject);
 	newUser.save();
 	return newUser;

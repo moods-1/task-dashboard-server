@@ -1,44 +1,29 @@
 const User = require('../models/User');
+const { tryCatch } = require('../utilities/tryCatch');
 
-exports.getAllUsersController = async (req, res) => {
-	try {
-		const users = await User.find();
-		res.status(200).send(users);
-	} catch (error) {
-		res.status(400).send({ msg: error });
-	}
-};
+exports.getAllUsersController = tryCatch(async (req, res, next) => {
+	const users = await User.find();
+	res.status(200).send(users);
+});
 
-exports.getUserByIdController = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const user = await User.findUser(id);
-		res.status(200).send(user);
-	} catch (error) {
-		res.status(400).send({ msg: error });
-	}
-};
+exports.getUserByIdController = tryCatch(async (req, res) => {
+	const { id } = req.params;
+	const user = await User.findUser(id);
+	res.status(200).send(user);
+});
 
-exports.postUserController = async (req, res) => {
-	try {
-		const { body } = req;
-		const user = await User.addUser(body);
+exports.postUserController = tryCatch(async (req, res) => {
+	const { body } = req;
+	const user = await User.addUser(body);
+	res.status(200).json(user);
+});
+
+exports.patchUserController = tryCatch(async (req, res) => {
+	const { body } = req;
+	const user = await User.updateUser(body);
+	if ('firstName' in user) {
 		res.status(200).json(user);
-	} catch (error) {
-		res.send(error);
+	} else {
+		res.status(400).json(user);
 	}
-};
-
-exports.patchUserController = async (req, res) => {
-	try {
-		const { body } = req;
-		const user = await User.updateUser(body);
-		if ('firstName' in user) {
-			res.status(200).json(user);
-		} else {
-			res.status(400).json(user);
-		}
-	} catch (error) {
-		res.status(400).json(error);
-	}
-};
+});
