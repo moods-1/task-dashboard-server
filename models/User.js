@@ -66,9 +66,13 @@ UserSchema.statics.addUser = function (userObject) {
 // Update user
 UserSchema.statics.updateUser = async function (userObject) {
 	const { _id: id } = userObject;
-	return await User.findByIdAndUpdate(id, {
-		$set: { ...userObject },
-	}).exec();
+	return await User.findByIdAndUpdate(
+		id,
+		{
+			$set: { ...userObject },
+		},
+		{ returnDocument: 'after' }
+	);
 };
 
 const User = mongoose.model('User', UserSchema);

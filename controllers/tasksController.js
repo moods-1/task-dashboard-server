@@ -2,22 +2,35 @@ const Task = require('../models/Task');
 const User = require('../models/User');
 const Column = require('../models/Column');
 const { tryCatch } = require('../utilities/tryCatch');
+const { OK, SUCCESS } = require('../helpers/constants');
+const { responseFormatter } = require('../helpers/helperFunctions');
 
 exports.getAllTasksController = tryCatch(async (req, res) => {
-	const tasks = await Task.find();
-	res.status(200).json(tasks);
+	const result = await Task.find();
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
+});
+
+exports.getTaskDetailsController = tryCatch(async (req, res) => {
+	const filter = { priority: 0 };
+	const select = 'taskTitle assignee';
+	const result = await Task.getTaskDetails(filter, select);
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
 });
 
 exports.updateTaskController = tryCatch(async (req, res) => {
 	const { body } = req;
 	const result = await Task.updateTask(body);
-	res.status(200).json(result);
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
 });
 
 exports.addTaskController = tryCatch(async (req, res) => {
 	const { body } = req;
 	const result = await Task.updateTask(body);
-	res.status(200).json(result);
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
 });
 
 exports.deleteTaskController = tryCatch(async (req, res) => {
@@ -28,5 +41,6 @@ exports.deleteTaskController = tryCatch(async (req, res) => {
 	}).exec();
 	await Column.findByIdAndUpdate(columnId, { $pull: { taskIds: id } }).exec();
 	await Task.findByIdAndDelete({ _id: id }).exec();
-	res.status(200).json({ message: 'Task deleted successfully!' });
+	const response = responseFormatter(OK, 'Task deleted successfully!', {});
+	res.json(response);
 });

@@ -1,29 +1,37 @@
 const User = require('../models/User');
 const { tryCatch } = require('../utilities/tryCatch');
+const { OK, SUCCESS } = require('../helpers/constants');
+const { responseFormatter } = require('../helpers/helperFunctions');
 
 exports.getAllUsersController = tryCatch(async (req, res, next) => {
-	const users = await User.find();
-	res.status(200).send(users);
+	const result = await User.find();
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
 });
 
 exports.getUserByIdController = tryCatch(async (req, res) => {
 	const { id } = req.params;
-	const user = await User.findById(id);
-	res.status(200).send(user);
+	const result = await User.findById(id);
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
 });
 
 exports.postUserController = tryCatch(async (req, res) => {
 	const { body } = req;
-	const user = await User.addUser(body);
-	res.status(200).json(user);
+	const result = await User.addUser(body);
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
 });
 
 exports.patchUserController = tryCatch(async (req, res) => {
 	const { body } = req;
-	const user = await User.updateUser(body);
-	if ('firstName' in user) {
-		res.status(200).json(user);
+	const result = await User.updateUser(body);
+	let response;
+	if ('firstName' in result) {
+		response = responseFormatter(OK, SUCCESS, result);
+		res.json(response);
 	} else {
-		res.status(200).json({ message: 'No changes made.' });
+		response = responseFormatter(OK, 'No changes made.',{});
+		res.json(response);
 	}
 });

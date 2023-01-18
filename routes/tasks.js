@@ -4,10 +4,12 @@ const {
 	updateTaskController,
 	addTaskController,
 	deleteTaskController,
+	getTaskDetailsController,
 } = require('../controllers/tasksController');
 
 //GET
 router.get('/', getAllTasksController);
+router.get('/details', getTaskDetailsController);
 
 //PATCH
 router.patch('/', updateTaskController);

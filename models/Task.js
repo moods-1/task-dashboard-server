@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const User = require('./User');
 const Column = require('./Column');
+const { OK, SERVER_ERROR, SUCCESS, FAILED } = require('../helpers/constants');
+const { responseFormatter } = require('../helpers/helperFunctions');
 
 const TaskSchema = new Schema(
 	{
@@ -70,37 +72,34 @@ TaskSchema.statics.addTask = async function (taskObject) {
 
 // Get task by field and partial value
 TaskSchema.statics.findByFieldAndValue = async function (field, value) {
-	try {
-		const result = await Task.find({
-			[field]: { $regex: `${value.toLowerCase()}` },
-		});
-		return result;
-	} catch (error) {
-		return error;
-	}
+	return await Task.find({
+		[field]: { $regex: `${value.toLowerCase()}` },
+	});
 };
 
 // Update task
 TaskSchema.statics.updateTask = async function (taskObject) {
-	try {
-		const { _id: id, assignee, originalAssignee } = taskObject;
-		// Update assigned user
-		await User.findByIdAndUpdate(
-			{ _id: originalAssignee },
-			{ $pull: { assignedTasks: id } }
-		).exec();
-		await User.findByIdAndUpdate(
-			{ _id: assignee },
-			{ $push: { assignedTasks: id } }
-		).exec();
-		delete taskObject.originalAssignee;
-		return await Task.updateOne(
-			{ _id: id },
-			{ $set: { ...taskObject } }
-		).exec();
-	} catch (error) {
-		return error;
-	}
+	const { _id: id, assignee, originalAssignee } = taskObject;
+	// Update assigned user
+	await User.findByIdAndUpdate(
+		{ _id: originalAssignee },
+		{ $pull: { assignedTasks: id } }
+	).exec();
+	await User.findByIdAndUpdate(
+		{ _id: assignee },
+		{ $push: { assignedTasks: id } }
+	).exec();
+	delete taskObject.originalAssignee;
+	return await Task.findByIdAndUpdate(
+		{ _id: id },
+		{ $set: { ...taskObject } },
+		{returnDocument:'after'}
+	).exec();
+
+};
+
+TaskSchema.statics.getTaskDetails = async (filter, select) => {
+	return await Task.find(filter).select(select);
 };
 
 const Task = mongoose.model('Task', TaskSchema);
