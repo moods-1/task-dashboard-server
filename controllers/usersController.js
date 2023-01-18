@@ -8,7 +8,7 @@ exports.getAllUsersController = tryCatch(async (req, res, next) => {
 
 exports.getUserByIdController = tryCatch(async (req, res) => {
 	const { id } = req.params;
-	const user = await User.findUser(id);
+	const user = await User.findById(id);
 	res.status(200).send(user);
 });
 
@@ -24,6 +24,6 @@ exports.patchUserController = tryCatch(async (req, res) => {
 	if ('firstName' in user) {
 		res.status(200).json(user);
 	} else {
-		res.status(400).json(user);
+		res.status(200).json({ message: 'No changes made.' });
 	}
 });

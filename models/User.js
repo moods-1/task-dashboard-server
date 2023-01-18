@@ -56,16 +56,6 @@ const UserSchema = new Schema(
 	{ collection: 'User' }
 );
 
-// Find a user by id
-UserSchema.statics.findUser = async function (id) {
-	return await User.findById(id);
-};
-
-// Get all users
-UserSchema.statics.findAllUsers = async function () {
-	return await User.find();
-};
-
 // Create new user
 UserSchema.statics.addUser = function (userObject) {
 	const newUser = new User(userObject);
