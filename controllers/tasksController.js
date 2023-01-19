@@ -12,7 +12,7 @@ exports.getAllTasksController = tryCatch(async (req, res) => {
 });
 
 exports.getTaskDetailsController = tryCatch(async (req, res) => {
-	const filter = { priority: 0 };
+	const { body: filter } = req;
 	const select = 'taskTitle assignee';
 	const result = await Task.getTaskDetails(filter, select);
 	const response = responseFormatter(OK, SUCCESS, result);
