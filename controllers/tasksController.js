@@ -44,3 +44,11 @@ exports.deleteTaskController = tryCatch(async (req, res) => {
 	const response = responseFormatter(OK, 'Task deleted successfully!', {});
 	res.json(response);
 });
+
+exports.tasksDueSoonController = tryCatch(async (req, res) => {
+	const { days } = req.params;
+	console.log({ days });
+	const result = await Task.dueSoon(days);
+	const response = responseFormatter(OK, SUCCESS, result);
+	res.json(response);
+});

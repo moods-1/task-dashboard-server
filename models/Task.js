@@ -102,5 +102,17 @@ TaskSchema.statics.getTaskDetails = async (filter, select) => {
 	return await Task.find(filter).select(select);
 };
 
+TaskSchema.statics.dueSoon = async (days) => {
+	const today = new Date();
+	const daysUntilDue = Number(days) || 5;
+	const dateDue = new Date(today.setDate(today.getDate() + daysUntilDue));
+	return await Task.find({
+		dueDate: {
+			$gte: new Date(),
+			$lt: dateDue,
+		},
+	});
+};
+
 const Task = mongoose.model('Task', TaskSchema);
 module.exports = Task;

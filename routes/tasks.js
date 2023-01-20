@@ -5,11 +5,13 @@ const {
 	addTaskController,
 	deleteTaskController,
 	getTaskDetailsController,
+	tasksDueSoonController,
 } = require('../controllers/tasksController');
 
 //GET
 router.get('/', getAllTasksController);
 router.get('/details', getTaskDetailsController);
+router.get('/tasks-due-soon/:days', tasksDueSoonController);
 
 //PATCH
 router.patch('/', updateTaskController);
