@@ -28,7 +28,7 @@ exports.updateTaskController = tryCatch(async (req, res) => {
 
 exports.addTaskController = tryCatch(async (req, res) => {
 	const { body } = req;
-	const result = await Task.updateTask(body);
+	const result = await Task.addTask(body);
 	const response = responseFormatter(OK, SUCCESS, result);
 	res.json(response);
 });
