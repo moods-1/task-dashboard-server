@@ -1,0 +1,21 @@
+{
+	"name": "server",
+	"version": "1.0.0",
+	"description": "task server",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"dev-start": "nodemon index.js"
+	},
+	"author": "Cee Moods",
+	"license": "ISC",
+	"dependencies": {
+		"cloudinary": "^1.33.0",
+		"compression": "^1.7.4",
+		"cors": "^2.8.5",
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"mongoose": "^6.8.2",
+		"morgan": "^1.10.0"
+	}
+}
