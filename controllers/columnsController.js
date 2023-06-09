@@ -1,11 +1,7 @@
 const Column = require('../models/Column');
 const Task = require('../models/Task');
 const { tryCatch } = require('../utilities/tryCatch');
-<<<<<<< HEAD
 const { OK, SUCCESS, TASK_STATES } = require('../helpers/constants');
-=======
-const { OK, SUCCESS } = require('../helpers/constants');
->>>>>>> e1a8a88b91425d0de492c247dd5dcdbd80913118
 const {
 	responseFormatter,
 	responseCacher,
