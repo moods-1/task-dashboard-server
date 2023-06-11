@@ -1,15 +1,58 @@
+const cron = require('node-cron');
 const Task = require('../models/Task');
 const User = require('../models/User');
 const Column = require('../models/Column');
 const { tryCatch } = require('../utilities/tryCatch');
-const { OK, SUCCESS } = require('../helpers/constants');
+const { OK, SUCCESS, TASK_STATES } = require('../helpers/constants');
 const {
 	responseFormatter,
 	responseCacher,
 } = require('../helpers/helperFunctions');
 
-exports.getAllTasksController = tryCatch(async (req, res) => {
-	const result = await Task.find();
+const taskManager = async () => {
+	const completeColumnId = '63c16dc19e9fb6a68ff1a4a6';
+	const now = new Date().toISOString().split('T')[0];
+	const result = await Task.find({ state: TASK_STATES.COMPLETE });
+	const update = async (t) => {
+		await Task.findByIdAndUpdate({ _id: t._id }, { ...t }).exec();
+		await Column.findByIdAndUpdate(
+			{ _id: completeColumnId },
+			{ $pull: { taskIds: t._id } }
+		).exec();
+	};
+
+	if (result) {
+		result.forEach((t) => {
+			const compDate = t.completionDate.toISOString().split('T')[0];
+			if (now !== compDate) {
+				t.complete = true;
+				t.state = TASK_STATES.DONE;
+				t.priority = 99;
+				update(t);
+			}
+		});
+	}
+};
+
+cron.schedule(
+	'0 0 * * *',
+	() => {
+		taskManager();
+	},
+	{
+		scheduled: true,
+		timezone: 'America/Toronto',
+	}
+);
+
+exports.getTasksController = tryCatch(async (req, res) => {
+	const { done } = req.params;
+	let result;
+	if (done === 'true') {
+		result = await Task.find({ complete: true }).sort();
+	} else {
+		result = await Task.find({ complete: false });
+	}
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });

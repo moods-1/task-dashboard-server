@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const {
-	getAllTasksController,
+	getTasksController,
 	updateTaskController,
 	addTaskController,
 	deleteTaskController,
@@ -9,7 +9,7 @@ const {
 } = require('../controllers/tasksController');
 
 //GET
-router.get('/', getAllTasksController);
+router.get('/:done', getTasksController);
 router.get('/details', getTaskDetailsController);
 router.get('/tasks-due-soon/:days', tasksDueSoonController);
 

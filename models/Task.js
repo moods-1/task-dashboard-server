@@ -111,6 +111,7 @@ TaskSchema.statics.dueSoon = async (days) => {
 			$gte: new Date(),
 			$lt: dateDue,
 		},
+		complete: false,
 	});
 };
 

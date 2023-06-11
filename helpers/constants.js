@@ -11,4 +11,5 @@ exports.TASK_STATES = {
     COMPLETE: 'Complete',
     IN_PROGRESS: 'In Progress',
     TO_DO: 'To Do',
+    DONE: 'Done',
 }
