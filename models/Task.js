@@ -17,6 +17,12 @@ const TaskSchema = new Schema(
 			ref: 'User',
 			required: true,
 		},
+		assigneeName: {
+			type: String,
+		},
+		assigneeImage: {
+			type: String,
+		},
 		complete: {
 			type: Boolean,
 			required: true,
@@ -93,9 +99,8 @@ TaskSchema.statics.updateTask = async function (taskObject) {
 	return await Task.findByIdAndUpdate(
 		{ _id: id },
 		{ $set: { ...taskObject } },
-		{returnDocument:'after'}
+		{ returnDocument: 'after' }
 	).exec();
-
 };
 
 TaskSchema.statics.getTaskDetails = async (filter, select) => {

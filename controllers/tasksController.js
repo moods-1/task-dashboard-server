@@ -35,8 +35,10 @@ const taskManager = async () => {
 };
 
 cron.schedule(
-	'0 0 * * *',
+	// Run every 5 minutes
+	'*/5 * * * *',
 	() => {
+		console.log('Run cron job.');
 		taskManager();
 	},
 	{
@@ -66,6 +68,7 @@ exports.getTaskDetailsController = tryCatch(async (req, res) => {
 });
 
 exports.updateTaskController = tryCatch(async (req, res) => {
+	Task.syncIndexes();
 	const { body } = req;
 	const result = await Task.updateTask(body);
 	const response = responseFormatter(OK, SUCCESS, result);
@@ -73,6 +76,7 @@ exports.updateTaskController = tryCatch(async (req, res) => {
 });
 
 exports.addTaskController = tryCatch(async (req, res) => {
+	Task.syncIndexes();
 	const { body } = req;
 	const result = await Task.addTask(body);
 	const response = responseFormatter(OK, SUCCESS, result);
