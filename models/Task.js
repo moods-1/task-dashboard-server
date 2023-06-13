@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const User = require('./User');
-const Column = require('./Column');
-const { OK, SERVER_ERROR, SUCCESS, FAILED } = require('../helpers/constants');
-const { responseFormatter } = require('../helpers/helperFunctions');
 
 const TaskSchema = new Schema(
 	{
