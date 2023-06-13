@@ -51,7 +51,7 @@ exports.getTasksController = tryCatch(async (req, res) => {
 	const { done } = req.params;
 	let result;
 	if (done === 'true') {
-		result = await Task.find({ complete: true }).sort();
+		result = await Task.find({ complete: true }).sort({ completionDate: 1 });
 	} else {
 		result = await Task.find({ complete: false });
 	}
