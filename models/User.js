@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const { USER_ROLES } = require('../helpers/constants');
 
 const UserSchema = new Schema(
 	{
@@ -49,9 +50,19 @@ const UserSchema = new Schema(
 				ref: 'Task',
 			},
 		],
+		roles: [
+			{
+				type: String,
+				default: USER_ROLES.DEFAULT,
+			}
+		],
 		token: {
 			type: String,
 		},
+		companyId: {
+			type: Schema.Types.ObjectId,
+			required: true,
+		}
 	},
 	{ collection: 'User' }
 );

@@ -1,25 +1,27 @@
 const router = require('express').Router();
 const {
 	getTasksController,
+	getCompanyTasksController,
 	updateTaskController,
 	addTaskController,
 	deleteTaskController,
 	getTaskDetailsController,
 	tasksDueSoonController,
 } = require('../controllers/tasksController');
+const auth = require('../middleware/auth');
 
 //GET
-router.get('/:done', getTasksController);
-router.get('/details', getTaskDetailsController);
-router.get('/tasks-due-soon/:days', tasksDueSoonController);
+router.get('/:done', auth, getTasksController);
+router.get('/by/companyId/:done/:companyId', auth, getCompanyTasksController);
+router.get('/details', auth, getTaskDetailsController);
+router.get('/tasks-due-soon/:days/:companyId', auth, tasksDueSoonController);
+router.get('/by/companyId/:companyId', auth, getCompanyTasksController);
 
 //PATCH
-router.patch('/', updateTaskController);
-
+router.patch('/', auth, updateTaskController);
 //POST
-router.post('/', addTaskController);
-
+router.post('/', auth, addTaskController);
 //DELETE
-router.delete('/', deleteTaskController);
+router.delete('/', auth, deleteTaskController);
 
 module.exports = router;

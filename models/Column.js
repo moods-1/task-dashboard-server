@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const { updateMovedTask } = require('../helpers/helperFunctions');
 
 const ColumnSchema = new Schema(
 	{
@@ -15,13 +16,17 @@ const ColumnSchema = new Schema(
 				ref: 'Task',
 			},
 		],
+		companyId: {
+			type: Schema.Types.ObjectId,
+		}
 	},
 	{ collection: 'Column' }
 );
 
 // Move tasks internally
 ColumnSchema.statics.moveInternal = async function (body) {
-	const { sourceTaskId, sourceIndex, destinationIndex, destinationId } = body;
+	const { sourceTaskId, sourceIndex, destinationIndex, destinationId, mover } = body;
+	await updateMovedTask(sourceTaskId, mover)
 	const column = await Column.findById(destinationId);
 	column.taskIds.splice(sourceIndex, 1);
 	column.taskIds.splice(destinationIndex, 0, sourceTaskId);

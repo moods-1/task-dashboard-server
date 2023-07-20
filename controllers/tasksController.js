@@ -38,7 +38,6 @@ cron.schedule(
 	// Run every 5 minutes
 	'*/5 * * * *',
 	() => {
-		console.log('Run cron job.');
 		taskManager();
 	},
 	{
@@ -54,6 +53,20 @@ exports.getTasksController = tryCatch(async (req, res) => {
 		result = await Task.find({ complete: true }).sort({ completionDate: 1 });
 	} else {
 		result = await Task.find({ complete: false });
+	}
+	const response = responseFormatter(OK, SUCCESS, result);
+	responseCacher(req, res, response);
+});
+
+exports.getCompanyTasksController = tryCatch(async (req, res) => {
+	const { done, companyId } = req.params;
+	let result;
+	if (done === 'true') {
+		result = await Task.find({ complete: true, companyId }).sort({
+			completionDate: 1,
+		});
+	} else {
+		result = await Task.find({ complete: false, companyId });
 	}
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
@@ -96,8 +109,8 @@ exports.deleteTaskController = tryCatch(async (req, res) => {
 });
 
 exports.tasksDueSoonController = tryCatch(async (req, res) => {
-	const { days } = req.params;
-	const result = await Task.dueSoon(days);
+	const { days, companyId } = req.params;
+	const result = await Task.dueSoon(days, companyId);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });

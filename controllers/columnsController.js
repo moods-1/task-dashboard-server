@@ -5,10 +5,18 @@ const { OK, SUCCESS, TASK_STATES } = require('../helpers/constants');
 const {
 	responseFormatter,
 	responseCacher,
+	updateMovedTask,
 } = require('../helpers/helperFunctions');
 
 exports.getAllColumnsController = tryCatch(async (req, res) => {
 	const result = await Column.find();
+	const response = responseFormatter(OK, SUCCESS, result);
+	responseCacher(req, res, response);
+});
+
+exports.getCompanyColumnsController = tryCatch(async (req, res) => {
+	const { companyId } = req.params;
+	const result = await Column.find({ companyId });
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
@@ -27,7 +35,9 @@ exports.patchMoveExternalController = tryCatch(async (req, res) => {
 		sourceId,
 		destinationIndex,
 		destinationId,
+		mover,
 	} = req.body;
+	await updateMovedTask(sourceTaskId, mover);
 	// Handle source column
 	const sourceColumn = await Column.findById(sourceId);
 	sourceColumn.taskIds.splice(sourceIndex, 1);

@@ -13,3 +13,8 @@ exports.TASK_STATES = {
     TO_DO: 'To Do',
     DONE: 'Done',
 }
+
+exports.USER_ROLES = {
+    ADMIN: 'admin',
+    DEFAULT: 'default',
+}

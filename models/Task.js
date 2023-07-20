@@ -53,6 +53,15 @@ const TaskSchema = new Schema(
 			default: Date.now,
 			required: true,
 		},
+		lastMovedBy: {
+			type: Map,
+			of: Schema.Types.Mixed,
+			default: {},
+		},
+		companyId: {
+			type: Schema.Types.ObjectId,
+			required: true,
+		},
 	},
 	{ collection: 'Task' }
 );
@@ -104,7 +113,7 @@ TaskSchema.statics.getTaskDetails = async (filter, select) => {
 	return await Task.find(filter).select(select);
 };
 
-TaskSchema.statics.dueSoon = async (days) => {
+TaskSchema.statics.dueSoon = async (days, companyId) => {
 	const today = new Date();
 	const daysUntilDue = Number(days) || 5;
 	const dateDue = new Date(today.setDate(today.getDate() + daysUntilDue));
@@ -114,6 +123,7 @@ TaskSchema.statics.dueSoon = async (days) => {
 			$lt: dateDue,
 		},
 		complete: false,
+		companyId,
 	});
 };
 
