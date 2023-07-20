@@ -9,14 +9,14 @@ const {
 } = require('../helpers/helperFunctions');
 
 exports.getAllColumnsController = tryCatch(async (req, res) => {
-	const result = await Column.find();
+	const result = await Column.find().sort({ _id: 1 });
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.getCompanyColumnsController = tryCatch(async (req, res) => {
 	const { companyId } = req.params;
-	const result = await Column.find({ companyId });
+	const result = await Column.find({ companyId }).sort({ _id: 1 });
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
