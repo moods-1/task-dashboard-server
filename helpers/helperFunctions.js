@@ -31,11 +31,16 @@ exports.updateMovedTask = async (taskId, mover) => {
 	);
 };
 
-exports.storeImage = async (data) => {
-	const img = await v2.uploader.upload(data);
+exports.storeImage = async (data, folder) => {
+	let img = {};
+	if (folder) {
+		img = await v2.uploader.upload(data, { folder });
+	} else {
+		img = await v2.uploader.upload(data);
+	}
 	return img.url;
 };
 
 exports.hashPassword = async (data) => {
 	return await bcrypt.hashSync(data, 8);
-}
+};

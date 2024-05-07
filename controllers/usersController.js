@@ -15,6 +15,11 @@ const generateToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
+const noReturnOptions = {
+	password: 0,
+	joinDate: 0,
+};
+
 exports.loginUserController = tryCatch(async (req, res, next) => {
 	const { email: em, password } = req.body;
 	const user = await User.findOne({ email: em });
@@ -24,8 +29,16 @@ exports.loginUserController = tryCatch(async (req, res, next) => {
 	if (user) {
 		const goodPassword = await bcrypt.compare(password, user.password);
 		if (goodPassword) {
-			const { firstName, lastName, email, phoneNumber, image, _id, companyId, roles } =
-				user;
+			const {
+				firstName,
+				lastName,
+				email,
+				phoneNumber,
+				image,
+				_id,
+				companyId,
+				roles,
+			} = user;
 			result = {
 				firstName,
 				lastName,
@@ -37,6 +50,8 @@ exports.loginUserController = tryCatch(async (req, res, next) => {
 				roles,
 				token: generateToken(_id),
 			};
+			await User.updateMany({}, { loggedIn: false });
+			await User.updateOne({ _id }, { loggedIn: true });
 			response = responseFormatter(OK, SUCCESS, result);
 		} else {
 			message = 'The password is incorrect.';
@@ -50,21 +65,22 @@ exports.loginUserController = tryCatch(async (req, res, next) => {
 });
 
 exports.getAllUsersController = tryCatch(async (req, res) => {
-	const result = await User.find({}, { password: 0, joinDate: 0 });
+	User.syncIndexes();
+	const result = await User.find({}, noReturnOptions);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.getUsersByCompanyController = tryCatch(async (req, res) => {
 	const { companyId } = req.params;
-	const result = await User.find({ companyId }, { password: 0, joinDate: 0 });
+	const result = await User.find({ companyId }, noReturnOptions);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.getUserByIdController = tryCatch(async (req, res) => {
 	const { id } = req.params;
-	const result = await User.findById(id);
+	const result = await User.findById(id, noReturnOptions);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
@@ -72,14 +88,14 @@ exports.getUserByIdController = tryCatch(async (req, res) => {
 exports.postUserController = tryCatch(async (req, res) => {
 	const { body } = req;
 	const { image, password } = body;
-	const imageUrl = await storeImage(image);
-	body.image = imageUrl.url;
+	body.image = await storeImage(image, 'dashboard');
 	const userExists = await User.findOne({ email });
 	if (userExists) {
 		res.status(400);
 		throw new Error('An account with that email exists already.');
 	}
 	body.password = await hashPassword(password);
+	body.loggedIn = true;
 	const result = await User.addUser(body);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
@@ -90,8 +106,7 @@ exports.patchUserController = tryCatch(async (req, res) => {
 	const { password } = body;
 	if (body.newImage) {
 		const { image } = body;
-		const imageUrl = await storeImage(image);
-		body.image = imageUrl.url;
+		body.image = await storeImage(image, 'dashboard');
 	}
 	if (password) {
 		body.password = await hashPassword(password);
@@ -102,6 +117,24 @@ exports.patchUserController = tryCatch(async (req, res) => {
 	if ('firstName' in result) {
 		response = responseFormatter(OK, SUCCESS, result);
 		responseCacher(req, res, response);
+	} else {
+		response = responseFormatter(OK, 'No changes made.', {});
+		responseCacher(req, res, response);
+	}
+});
+
+exports.patchLogoutController = tryCatch(async (req, res) => {
+	const { body } = req;
+	const { id } = body;
+	const result = await User.findOneAndUpdate(
+		{ _id: id },
+		{ loggedIn: false },
+		{ returnOriginal: false }
+	);
+	let response;
+	if ('firstName' in result) {
+		response = responseFormatter(OK, SUCCESS, result);
+		res.json(response);
 	} else {
 		response = responseFormatter(OK, 'No changes made.', {});
 		responseCacher(req, res, response);

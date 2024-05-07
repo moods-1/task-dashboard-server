@@ -62,6 +62,10 @@ const UserSchema = new Schema(
 		companyId: {
 			type: Schema.Types.ObjectId,
 			required: true,
+		},
+		loggedIn: {
+			type: Boolean,
+			default: false,
 		}
 	},
 	{ collection: 'User' }

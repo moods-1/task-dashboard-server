@@ -22,11 +22,13 @@ const taskRouter = require('./routes/tasks');
 const userRouter = require('./routes/users');
 const columnRouter = require('./routes/columns');
 const companyRouter = require('./routes/companies');
+const customerRouter = require('./routes/customers');
 
 app.use('/tasks', taskRouter);
 app.use('/users', userRouter);
 app.use('/columns', columnRouter);
 app.use('/companies', companyRouter);
+app.use('/customers', customerRouter);
 app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));

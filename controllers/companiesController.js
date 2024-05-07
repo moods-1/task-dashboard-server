@@ -11,7 +11,7 @@ exports.getCompaniesController = tryCatch(async (req, res) => {
 
 exports.getCompanyByIdController = tryCatch(async (req, res) => {
 	const { companyId } = req.params;
-	const result = await Company.find({companyId});
+	const result = await Company.findById(companyId);
 	const response = responseFormatter(OK, SUCCESS, result);
 	res.json(response);
 });
@@ -19,7 +19,7 @@ exports.getCompanyByIdController = tryCatch(async (req, res) => {
 exports.addCompanyController = tryCatch(async (req, res) => {
 	const { body } = req;
 	if (body.logo) {
-		body.logo = await storeImage(body.logo);
+		body.logo = await storeImage(body.logo, 'dashboard');
 	}
 	const result = await Company.create(body);
 	const response = responseFormatter(OK, SUCCESS, result);
