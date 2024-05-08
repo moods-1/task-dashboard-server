@@ -18,3 +18,8 @@ exports.USER_ROLES = {
     ADMIN: 'admin',
     DEFAULT: 'default',
 }
+
+exports.NO_RETURN_OPTIONS = {
+	password: 0,
+	joinDate: 0,
+};

@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { tryCatch } = require('../utilities/tryCatch');
-const { OK, SUCCESS } = require('../helpers/constants');
+const { OK, SUCCESS, NO_RETURN_OPTIONS } = require('../helpers/constants');
 const {
 	responseFormatter,
 	responseCacher,
@@ -15,42 +15,18 @@ const generateToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-const noReturnOptions = {
-	password: 0,
-	joinDate: 0,
-};
-
 exports.loginUserController = tryCatch(async (req, res, next) => {
-	const { email: em, password } = req.body;
-	const user = await User.findOne({ email: em });
+	const { email, password } = req.body;
+	const user = await User.findOne({ email }).lean();
 	let result = {};
 	let response;
 	let message;
 	if (user) {
 		const goodPassword = await bcrypt.compare(password, user.password);
 		if (goodPassword) {
-			const {
-				firstName,
-				lastName,
-				email,
-				phoneNumber,
-				image,
-				_id,
-				companyId,
-				roles,
-			} = user;
-			result = {
-				firstName,
-				lastName,
-				email,
-				phoneNumber,
-				image,
-				_id,
-				companyId,
-				roles,
-				token: generateToken(_id),
-			};
-			await User.updateMany({}, { loggedIn: false });
+			const { _id } = user;
+			delete user.password;
+			result = { ...user, token: generateToken(_id) };
 			await User.updateOne({ _id }, { loggedIn: true });
 			response = responseFormatter(OK, SUCCESS, result);
 		} else {
@@ -66,21 +42,23 @@ exports.loginUserController = tryCatch(async (req, res, next) => {
 
 exports.getAllUsersController = tryCatch(async (req, res) => {
 	User.syncIndexes();
-	const result = await User.find({}, noReturnOptions).sort({firstName: 1});
+	const result = await User.find({}, NO_RETURN_OPTIONS).sort({ firstName: 1 });
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.getUsersByCompanyController = tryCatch(async (req, res) => {
 	const { companyId } = req.params;
-	const result = await User.find({ companyId }, noReturnOptions).sort({firstName: 1});
+	const result = await User.find({ companyId }, NO_RETURN_OPTIONS).sort({
+		firstName: 1,
+	});
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.getUserByIdController = tryCatch(async (req, res) => {
 	const { id } = req.params;
-	const result = await User.findById(id, noReturnOptions);
+	const result = await User.findById(id, NO_RETURN_OPTIONS);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
@@ -96,14 +74,14 @@ exports.postUserController = tryCatch(async (req, res) => {
 	}
 	body.password = await hashPassword(password);
 	body.loggedIn = true;
-	const result = await User.addUser(body);
+	const result = await User.create(body);
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.patchUserController = tryCatch(async (req, res) => {
 	const { body } = req;
-	const { password } = body;
+	const { password, _id } = body;
 	if (body.newImage) {
 		const { image } = body;
 		body.image = await storeImage(image, 'dashboard');
@@ -112,7 +90,11 @@ exports.patchUserController = tryCatch(async (req, res) => {
 		body.password = await hashPassword(password);
 	}
 	delete body.newImage;
-	const result = await User.updateUser(body);
+	const result = await User.findOneAndUpdate(
+		{ _id },
+		{ $set: { ...body } },
+		{ fields: NO_RETURN_OPTIONS, new: true }
+	);
 	let response;
 	if ('firstName' in result) {
 		response = responseFormatter(OK, SUCCESS, result);
