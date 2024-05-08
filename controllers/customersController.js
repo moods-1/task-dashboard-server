@@ -4,7 +4,7 @@ const { tryCatch } = require('../utilities/tryCatch');
 const { responseFormatter, storeImage } = require('../helpers/helperFunctions');
 
 exports.getCustomersController = tryCatch(async (req, res) => {
-	const result = await Customer.find();
+	const result = await Customer.find().sort({ customerName: 1 });
 	const response = responseFormatter(OK, SUCCESS, result);
 	res.json(response);
 });

@@ -66,14 +66,14 @@ exports.loginUserController = tryCatch(async (req, res, next) => {
 
 exports.getAllUsersController = tryCatch(async (req, res) => {
 	User.syncIndexes();
-	const result = await User.find({}, noReturnOptions);
+	const result = await User.find({}, noReturnOptions).sort({firstName: 1});
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
 
 exports.getUsersByCompanyController = tryCatch(async (req, res) => {
 	const { companyId } = req.params;
-	const result = await User.find({ companyId }, noReturnOptions);
+	const result = await User.find({ companyId }, noReturnOptions).sort({firstName: 1});
 	const response = responseFormatter(OK, SUCCESS, result);
 	responseCacher(req, res, response);
 });
